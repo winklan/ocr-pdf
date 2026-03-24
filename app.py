@@ -7,6 +7,9 @@ app.config['TEMP_FOLDER'] = 'temp'
 app.config['OUTPUT_FOLDER'] = 'output'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 * 1024  # 2GB
 
+for pasta in ['uploads', 'temp', 'output']:
+    os.makedirs(pasta, exist_ok=True)
+
 @app.route('/')
 def index():
     return render_template('index.html')
