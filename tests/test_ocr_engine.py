@@ -48,3 +48,36 @@ def test_converter_paginas_retorna_lista_de_imagens():
     imagens = converter_paginas_em_imagens(FIXTURE_PDF, pagina_inicio=1, pagina_fim=1)
     assert len(imagens) == 1
     assert hasattr(imagens[0], 'size')  # é objeto PIL.Image
+
+
+def test_extrair_texto_retorna_string():
+    from ocr_engine import extrair_texto_imagem
+    from PIL import Image, ImageDraw
+
+    def criar_imagem_com_texto(texto):
+        """Cria imagem PIL simples com texto para teste."""
+        img = Image.new('RGB', (400, 100), color='white')
+        draw = ImageDraw.Draw(img)
+        draw.text((10, 10), texto, fill='black')
+        return img
+
+    img = criar_imagem_com_texto("Teste OCR")
+    texto = extrair_texto_imagem(img)
+    assert isinstance(texto, str)
+
+
+def test_extrair_pdf_pesquisavel_retorna_bytes():
+    from ocr_engine import extrair_pdf_pesquisavel_imagem
+    from PIL import Image, ImageDraw
+
+    def criar_imagem_com_texto(texto):
+        """Cria imagem PIL simples com texto para teste."""
+        img = Image.new('RGB', (400, 100), color='white')
+        draw = ImageDraw.Draw(img)
+        draw.text((10, 10), texto, fill='black')
+        return img
+
+    img = criar_imagem_com_texto("Teste OCR")
+    pdf_bytes = extrair_pdf_pesquisavel_imagem(img)
+    assert isinstance(pdf_bytes, bytes)
+    assert pdf_bytes[:4] == b'%PDF'  # assinatura PDF

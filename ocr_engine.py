@@ -65,3 +65,18 @@ def converter_paginas_em_imagens(caminho_pdf, pagina_inicio, pagina_fim, dpi=300
         poppler_path=POPPLER_PATH
     )
     return imagens
+
+
+def extrair_texto_imagem(imagem):
+    """Extrai texto de uma imagem PIL usando Tesseract. Retorna string."""
+    texto = pytesseract.image_to_string(imagem, lang='por')
+    return texto
+
+
+def extrair_pdf_pesquisavel_imagem(imagem):
+    """
+    Retorna bytes de um PDF de uma página com imagem original
+    e texto invisível sobreposto (PDF pesquisável).
+    """
+    pdf_bytes = pytesseract.image_to_pdf_or_hocr(imagem, lang='por', extension='pdf')
+    return pdf_bytes
