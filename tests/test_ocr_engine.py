@@ -38,3 +38,13 @@ def test_calcular_lotes_grande():
     assert len(lotes) == 20
     assert lotes[0] == (1, 500)
     assert lotes[-1] == (9501, 10000)
+
+
+def test_converter_paginas_retorna_lista_de_imagens():
+    from ocr_engine import converter_paginas_em_imagens
+    FIXTURE_PDF = os.path.join(os.path.dirname(__file__), 'fixtures', 'teste.pdf')
+    if not os.path.exists(FIXTURE_PDF):
+        pytest.skip("PDF de teste não encontrado")
+    imagens = converter_paginas_em_imagens(FIXTURE_PDF, pagina_inicio=1, pagina_fim=1)
+    assert len(imagens) == 1
+    assert hasattr(imagens[0], 'size')  # é objeto PIL.Image
