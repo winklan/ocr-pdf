@@ -2,11 +2,74 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>OCR - Conversor de PDF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR — Conversor de PDF</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>OCR - Conversor de PDF Digitalizado</h1>
+    <div class="container">
+        <header>
+            <h1>OCR — Conversor de PDF Digitalizado</h1>
+            {% if not config.tesseract_ok or not config.poppler_ok %}
+            <div class="alerta-erro">
+                {% if not config.tesseract_ok %}
+                <p>⚠️ Tesseract não encontrado. Instale o Tesseract OCR.</p>
+                {% endif %}
+                {% if not config.poppler_ok %}
+                <p>⚠️ Poppler não encontrado no caminho configurado.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </header>
+
+        <!-- Seção 1: Upload -->
+        <section id="secao-upload">
+            <div id="area-drop" class="area-drop">
+                <p>Arraste um PDF aqui ou</p>
+                <label for="input-arquivo" class="btn-secundario">Selecionar arquivo</label>
+                <input type="file" id="input-arquivo" accept=".pdf" hidden>
+                <p id="nome-arquivo" class="nome-arquivo"></p>
+            </div>
+
+            <div class="opcoes">
+                <fieldset>
+                    <legend>Formatos de saída</legend>
+                    <label><input type="checkbox" id="opt-pesquisavel" checked> PDF pesquisável</label>
+                    <label><input type="checkbox" id="opt-limpo" checked> PDF limpo (só texto)</label>
+                    <label><input type="checkbox" id="opt-txt" checked> Arquivo .txt</label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Tamanho do lote</legend>
+                    <label>Páginas por lote:
+                        <input type="number" id="tamanho-lote" value="500" min="10" max="2000">
+                    </label>
+                </fieldset>
+            </div>
+
+            <div id="info-pdf" class="info-pdf hidden"></div>
+
+            <button id="btn-iniciar" class="btn-primario" disabled>Iniciar OCR</button>
+        </section>
+
+        <!-- Seção 2: Progresso -->
+        <section id="secao-progresso" class="hidden">
+            <h2>Progresso</h2>
+            <p id="texto-progresso">Iniciando...</p>
+            <div class="barra-progresso">
+                <div id="barra-fill" class="barra-fill" style="width:0%"></div>
+            </div>
+            <p id="texto-percentual">0%</p>
+            <button id="btn-cancelar" class="btn-perigo">Cancelar</button>
+        </section>
+
+        <!-- Seção 3: Downloads -->
+        <section id="secao-downloads" class="hidden">
+            <h2>Arquivos Gerados</h2>
+            <div id="lista-downloads"></div>
+        </section>
+    </div>
+
     <script src="/static/app.js"></script>
 </body>
 </html>
