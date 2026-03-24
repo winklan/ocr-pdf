@@ -36,8 +36,12 @@ def processar_em_background(session_id, caminho_pdf, lotes, formatos, pasta_said
         try:
             arquivos = processar_lote(
                 caminho_pdf, numero_lote, inicio, fim,
-                pasta_saida, formatos, progresso
+                pasta_saida, formatos, progresso,
+                cancelar_fn=lambda _s=sessao: _s.get('cancelar', False)
             )
+            if arquivos is None:
+                sessao['status'] = 'cancelado'
+                return
             sessao['lotes_concluidos'].append({
                 'numero': numero_lote,
                 'arquivos': {k: os.path.basename(v) for k, v in arquivos.items()}
@@ -91,6 +95,7 @@ def upload():
 
 @app.route('/download/<session_id>/<nome_arquivo>')
 def download(session_id, nome_arquivo):
+    nome_arquivo = os.path.basename(nome_arquivo)  # evita path traversal
     caminho = os.path.join(app.config['OUTPUT_FOLDER'], session_id, nome_arquivo)
     if not os.path.exists(caminho):
         return jsonify({'erro': 'Arquivo não encontrado'}), 404

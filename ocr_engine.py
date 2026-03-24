@@ -107,8 +107,9 @@ def gerar_pdf_limpo(textos_por_pagina, caminho_saida):
     for i, texto in enumerate(textos_por_pagina, start=1):
         if i > 1:
             pdf.add_page()
-        # Limpar caracteres problemáticos para FPDF
-        texto_limpo = texto.encode('latin-1', errors='replace').decode('latin-1')
+        # Preservar caracteres Latin-1 (inclui ç, ã, á etc do português)
+        # Caracteres fora do Latin-1 (ex: aspas tipográficas, travessão) são removidos
+        texto_limpo = texto.encode('latin-1', errors='ignore').decode('latin-1')
         pdf.multi_cell(0, 6, texto_limpo)
 
     pdf.output(caminho_saida)
@@ -130,22 +131,29 @@ def gerar_pdf_pesquisavel(pdfs_por_pagina_bytes, caminho_saida):
 
 
 def processar_lote(caminho_pdf, numero_lote, pagina_inicio, pagina_fim,
-                   pasta_saida, formatos, callback_progresso=None):
+                   pasta_saida, formatos, callback_progresso=None, cancelar_fn=None):
     """
     Processa um lote de páginas e gera os arquivos de saída.
 
     formatos: dict com chaves 'pesquisavel', 'limpo', 'txt' (bool)
     callback_progresso: função(pagina_atual, total_paginas) chamada a cada página
+    cancelar_fn: função() que retorna True se o processamento deve ser cancelado
 
-    Retorna dict com caminhos dos arquivos gerados.
+    Retorna dict com caminhos dos arquivos gerados, ou None se cancelado.
+    Processa uma página por vez para não esgotar a RAM.
     """
     total_paginas_lote = pagina_fim - pagina_inicio + 1
     textos = []
     pdfs_pesquisavel = []
 
-    imagens = converter_paginas_em_imagens(caminho_pdf, pagina_inicio, pagina_fim)
+    for i, pagina_abs in enumerate(range(pagina_inicio, pagina_fim + 1)):
+        if cancelar_fn and cancelar_fn():
+            return None
 
-    for i, imagem in enumerate(imagens):
+        # Converter apenas 1 página por vez — evita pico de RAM
+        imagens = converter_paginas_em_imagens(caminho_pdf, pagina_abs, pagina_abs)
+        imagem = imagens[0]
+
         if formatos.get('txt') or formatos.get('limpo'):
             texto = extrair_texto_imagem(imagem)
             textos.append(texto)
