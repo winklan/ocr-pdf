@@ -127,3 +127,52 @@ def gerar_pdf_pesquisavel(pdfs_por_pagina_bytes, caminho_saida):
             writer.add_page(page)
     with open(caminho_saida, 'wb') as f:
         writer.write(f)
+
+
+def processar_lote(caminho_pdf, numero_lote, pagina_inicio, pagina_fim,
+                   pasta_saida, formatos, callback_progresso=None):
+    """
+    Processa um lote de páginas e gera os arquivos de saída.
+
+    formatos: dict com chaves 'pesquisavel', 'limpo', 'txt' (bool)
+    callback_progresso: função(pagina_atual, total_paginas) chamada a cada página
+
+    Retorna dict com caminhos dos arquivos gerados.
+    """
+    total_paginas_lote = pagina_fim - pagina_inicio + 1
+    textos = []
+    pdfs_pesquisavel = []
+
+    imagens = converter_paginas_em_imagens(caminho_pdf, pagina_inicio, pagina_fim)
+
+    for i, imagem in enumerate(imagens):
+        if formatos.get('txt') or formatos.get('limpo'):
+            texto = extrair_texto_imagem(imagem)
+            textos.append(texto)
+
+        if formatos.get('pesquisavel'):
+            pdf_bytes = extrair_pdf_pesquisavel_imagem(imagem)
+            pdfs_pesquisavel.append(pdf_bytes)
+
+        if callback_progresso:
+            callback_progresso(i + 1, total_paginas_lote)
+
+    prefixo = f'lote-{numero_lote:02d}'
+    arquivos_gerados = {}
+
+    if formatos.get('txt'):
+        caminho = os.path.join(pasta_saida, f'{prefixo}.txt')
+        gerar_txt(textos, caminho)
+        arquivos_gerados['txt'] = caminho
+
+    if formatos.get('limpo'):
+        caminho = os.path.join(pasta_saida, f'{prefixo}-limpo.pdf')
+        gerar_pdf_limpo(textos, caminho)
+        arquivos_gerados['limpo'] = caminho
+
+    if formatos.get('pesquisavel'):
+        caminho = os.path.join(pasta_saida, f'{prefixo}-pesquisavel.pdf')
+        gerar_pdf_pesquisavel(pdfs_pesquisavel, caminho)
+        arquivos_gerados['pesquisavel'] = caminho
+
+    return arquivos_gerados
