@@ -1,6 +1,9 @@
 import os
+import io
 import pytesseract
 from pdf2image import pdfinfo_from_path, convert_from_path
+from fpdf import FPDF
+from pypdf import PdfWriter, PdfReader
 
 # Caminhos das ferramentas
 TESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -80,3 +83,47 @@ def extrair_pdf_pesquisavel_imagem(imagem):
     """
     pdf_bytes = pytesseract.image_to_pdf_or_hocr(imagem, lang='por', extension='pdf')
     return pdf_bytes
+
+
+def gerar_txt(textos_por_pagina, caminho_saida):
+    """
+    textos_por_pagina: lista de strings, uma por página.
+    Salva arquivo .txt com marcadores de página.
+    """
+    with open(caminho_saida, 'w', encoding='utf-8') as f:
+        for i, texto in enumerate(textos_por_pagina, start=1):
+            if i > 1:
+                f.write(f'\n--- Página {i} ---\n\n')
+            f.write(texto)
+
+
+def gerar_pdf_limpo(textos_por_pagina, caminho_saida):
+    """Gera PDF contendo apenas o texto extraído, sem imagens."""
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font('Helvetica', size=11)
+
+    for i, texto in enumerate(textos_por_pagina, start=1):
+        if i > 1:
+            pdf.add_page()
+        # Limpar caracteres problemáticos para FPDF
+        texto_limpo = texto.encode('latin-1', errors='replace').decode('latin-1')
+        pdf.multi_cell(0, 6, texto_limpo)
+
+    pdf.output(caminho_saida)
+
+
+def gerar_pdf_pesquisavel(pdfs_por_pagina_bytes, caminho_saida):
+    """
+    pdfs_por_pagina_bytes: lista de bytes, um PDF de 1 página por item
+                           (saída de extrair_pdf_pesquisavel_imagem).
+    Mescla todas as páginas em um único PDF pesquisável.
+    """
+    writer = PdfWriter()
+    for pdf_bytes in pdfs_por_pagina_bytes:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        for page in reader.pages:
+            writer.add_page(page)
+    with open(caminho_saida, 'wb') as f:
+        writer.write(f)

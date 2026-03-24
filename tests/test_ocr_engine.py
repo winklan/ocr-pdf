@@ -81,3 +81,26 @@ def test_extrair_pdf_pesquisavel_retorna_bytes():
     pdf_bytes = extrair_pdf_pesquisavel_imagem(img)
     assert isinstance(pdf_bytes, bytes)
     assert pdf_bytes[:4] == b'%PDF'  # assinatura PDF
+
+
+def test_gerar_txt_cria_arquivo():
+    from ocr_engine import gerar_txt
+    import tempfile
+    textos = ["Texto da página 1.\n", "Texto da página 2.\n"]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        caminho = os.path.join(tmpdir, 'saida.txt')
+        gerar_txt(textos, caminho)
+        assert os.path.exists(caminho)
+        conteudo = open(caminho, encoding='utf-8').read()
+        assert 'Texto da página 1' in conteudo
+        assert '--- Página 2 ---' in conteudo
+
+def test_gerar_pdf_limpo_cria_arquivo():
+    from ocr_engine import gerar_pdf_limpo
+    import tempfile
+    textos = ["Texto da página 1.\n", "Texto da página 2.\n"]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        caminho = os.path.join(tmpdir, 'saida.pdf')
+        gerar_pdf_limpo(textos, caminho)
+        assert os.path.exists(caminho)
+        assert os.path.getsize(caminho) > 0
