@@ -1,0 +1,7 @@
+flask
+pytesseract
+Pillow
+pdf2image
+pypdf
+fpdf2
+pytest
