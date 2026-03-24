@@ -39,3 +39,14 @@ def obter_info_pdf(caminho_pdf):
         'paginas': info['Pages'],
         'nome': os.path.basename(caminho_pdf)
     }
+
+
+def calcular_lotes(total_paginas, tamanho_lote=500):
+    """Retorna lista de tuplas (pagina_inicio, pagina_fim)."""
+    lotes = []
+    inicio = 1
+    while inicio <= total_paginas:
+        fim = min(inicio + tamanho_lote - 1, total_paginas)
+        lotes.append((inicio, fim))
+        inicio = fim + 1
+    return lotes
