@@ -7,7 +7,7 @@ from pypdf import PdfWriter, PdfReader
 
 # Caminhos das ferramentas
 TESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-POPPLER_PATH = r'C:\Users\Henrique\poppler\poppler-24.08.0\Library\bin'
+POPPLER_PATH = r'C:\Users\Henrique\poppler-26.09.0\Library\bin'
 
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 

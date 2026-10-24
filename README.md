@@ -39,7 +39,7 @@ Antes de rodar, ajuste os caminhos em `ocr_engine.py` conforme sua instalação:
 
 ```python
 TESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-POPPLER_PATH   = r'C:\caminho\para\poppler\bin'
+POPPLER_PATH   = r'C:\Users\<seu-usuario>\poppler-26.09.0\Library\bin'
 ```
 
 ## Uso
