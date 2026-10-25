@@ -165,7 +165,7 @@ def processar_lote(caminho_pdf, numero_lote, pagina_inicio, pagina_fim,
         if callback_progresso:
             callback_progresso(i + 1, total_paginas_lote)
 
-    prefixo = f'lote-{numero_lote:02d}'
+    prefixo = 'processo' if numero_lote == 1 else f'processo{numero_lote}'
     arquivos_gerados = {}
 
     if formatos.get('txt'):
