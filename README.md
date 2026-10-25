@@ -13,6 +13,8 @@ Aplicação web local para converter PDFs digitalizados (imagens) em PDFs pesqui
 - Progresso em tempo real via Server-Sent Events (SSE)
 - Cancelamento durante o processamento
 - Download individual de cada arquivo gerado
+- Nome do documento exibido durante o processamento e na conclusão
+- Arquivos gerados nomeados como `processo`, `processo2`, `processo3`… (um por lote), com o final `-pesquisavel` / `-limpo` nos PDFs
 
 ## Requisitos
 
