@@ -1,5 +1,6 @@
 let sessionId = null;
 let eventoSource = null;
+let nomeDocumento = '';
 
 const areaDrop = document.getElementById('area-drop');
 const inputArquivo = document.getElementById('input-arquivo');
@@ -13,6 +14,7 @@ const textoProgresso = document.getElementById('texto-progresso');
 const barraFill = document.getElementById('barra-fill');
 const textoPercentual = document.getElementById('texto-percentual');
 const listaDownloads = document.getElementById('lista-downloads');
+const documentoAtual = document.getElementById('documento-atual');
 
 // Drag & drop
 areaDrop.addEventListener('dragover', e => { e.preventDefault(); areaDrop.classList.add('drag-over'); });
@@ -33,6 +35,7 @@ async function processarArquivoSelecionado(arquivo) {
         return;
     }
 
+    nomeDocumento = arquivo.name;
     nomeArquivo.textContent = `📄 ${arquivo.name}`;
     btnIniciar.disabled = true;
     infoPdf.textContent = 'Carregando informações do PDF...';
@@ -75,6 +78,7 @@ btnIniciar.addEventListener('click', async () => {
     }
 
     document.getElementById('secao-upload').classList.add('hidden');
+    documentoAtual.textContent = `📄 ${nomeDocumento}`;
     secaoProgresso.classList.remove('hidden');
     secaoDownloads.classList.remove('hidden');
 
@@ -118,7 +122,7 @@ function atualizarProgresso(dados) {
     if (dados.status === 'processando') {
         textoProgresso.textContent = `Lote ${loteAtual} de ${totalLotes} — Página ${pagAtual}/${totalPagLote}`;
     } else if (dados.status === 'concluido') {
-        textoProgresso.textContent = '✅ Processamento concluído!';
+        textoProgresso.textContent = `✅ Concluído: ${nomeDocumento}`;
         barraFill.style.width = '100%';
         textoPercentual.textContent = '100%';
         btnCancelar.disabled = true;
